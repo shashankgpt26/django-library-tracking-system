@@ -1,5 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+
+from .Pagination import CustomPagination
 from .models import Author, Book, Member, Loan
 from .serializers import AuthorSerializer, BookSerializer, MemberSerializer, LoanSerializer
 from rest_framework.decorators import action
@@ -11,8 +13,10 @@ class AuthorViewSet(viewsets.ModelViewSet):
     serializer_class = AuthorSerializer
 
 class BookViewSet(viewsets.ModelViewSet):
-    queryset = Book.objects.all()
+    # queryset = Book.objects.all()
+    queryset = Book.objects.select_related('author').all() #. to ensure that the number of queries is minimized when accessing related Author data
     serializer_class = BookSerializer
+    pagination_class = CustomPagination
 
     @action(detail=True, methods=['post'])
     def loan(self, request, pk=None):
